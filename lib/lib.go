@@ -32,6 +32,8 @@ func (i *Instance) Server(dir string) {
 	bootstrap.InitQbittorrent()
 	bootstrap.LoadStorages()
 
+	gin.SetMode(gin.ReleaseMode)
+
 	engine := gin.New()
 	engine.Use(gin.LoggerWithWriter(logrus.StandardLogger().Out), gin.RecoveryWithWriter(logrus.StandardLogger().Out))
 	server.Init(engine)
