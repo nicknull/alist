@@ -12,6 +12,7 @@ import (
 	"github.com/alist-org/alist/v3/internal/bootstrap"
 	"github.com/alist-org/alist/v3/internal/bootstrap/data"
 	"github.com/alist-org/alist/v3/internal/conf"
+	"github.com/alist-org/alist/v3/pkg/utils"
 	"github.com/alist-org/alist/v3/pkg/utils/random"
 	"github.com/alist-org/alist/v3/server"
 
@@ -48,7 +49,7 @@ func (i *Instance) Server(dir string) {
 	go func() {
 		err := i.server.ListenAndServe()
 		if err != nil {
-			logrus.Fatalf("failed to server: %+v", err)
+			utils.Log.Fatalf("failed to server: %+v", err)
 		}
 	}()
 }
