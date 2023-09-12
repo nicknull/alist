@@ -2,6 +2,7 @@ package AList
 
 import (
 	"fmt"
+	"github.com/alist-org/alist/v3/pkg/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,10 +49,10 @@ func (i *Instance) Server(dir string) {
 func (i *Instance) GetAdminPassword() string {
 	user, err := op.GetAdmin()
 	if err != nil {
-		logrus.Errorf("get admin user: %v", err)
+		utils.Log.Errorf("get admin user: %v", err)
 		return ""
 	} else {
-		logrus.Debugf("admin user password: %s", user.Password)
+		utils.Log.Debugf("admin user password: %s", user.Password)
 		return user.Password
 	}
 }
