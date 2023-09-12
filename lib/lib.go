@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -17,8 +16,8 @@ import (
 	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/internal/db"
 	"github.com/alist-org/alist/v3/pkg/utils"
-	"github.com/alist-org/alist/v3/pkg/utils/random"
 	"github.com/alist-org/alist/v3/server"
+	"github.com/alist-org/alist/v3/server/common"
 
 	_ "github.com/alist-org/alist/v3/drivers"
 
@@ -58,16 +57,8 @@ func (i *Instance) Server(dir string) {
 	}()
 }
 
-func (i *Instance) RandomString(n int) string {
-	return random.String(n)
-}
-
-func (i *Instance) SetEnv(key, value string) error {
-	return os.Setenv(key, value)
-}
-
-func (i *Instance) GetEnv(key string) string {
-	return os.Getenv(key)
+func (i *Instance) GenerateToken() (string, error) {
+	return common.GenerateToken("admin")
 }
 
 func (i *Instance) Shutdown() {
