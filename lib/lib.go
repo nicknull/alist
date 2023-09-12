@@ -22,8 +22,7 @@ type Instance struct {
 
 func (i *Instance) Server(dir string) {
 
-	initConfig(dir)
-
+	bootstrap.InitConfig(dir)
 	bootstrap.Log()
 	bootstrap.InitDB()
 	data.InitData()

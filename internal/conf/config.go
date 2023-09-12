@@ -3,7 +3,6 @@ package conf
 import (
 	"path/filepath"
 
-	"github.com/alist-org/alist/v3/cmd/flags"
 	"github.com/alist-org/alist/v3/pkg/utils/random"
 )
 
@@ -55,11 +54,11 @@ type Config struct {
 	TlsInsecureSkipVerify bool      `json:"tls_insecure_skip_verify" env:"TLS_INSECURE_SKIP_VERIFY"`
 }
 
-func DefaultConfig() *Config {
-	tempDir := filepath.Join(flags.DataDir, "temp")
-	indexDir := filepath.Join(flags.DataDir, "bleve")
-	logPath := filepath.Join(flags.DataDir, "log/log.log")
-	dbPath := filepath.Join(flags.DataDir, "data.db")
+func DefaultConfig(dir string) *Config {
+	tempDir := filepath.Join(dir, "temp")
+	indexDir := filepath.Join(dir, "bleve")
+	logPath := filepath.Join(dir, "log/log.log")
+	dbPath := filepath.Join(dir, "data.db")
 	return &Config{
 		Scheme: Scheme{
 			Address:    "0.0.0.0",
