@@ -48,8 +48,10 @@ func (i *Instance) Server(dir string) {
 func (i *Instance) GetAdminPassword() string {
 	user, err := op.GetAdmin()
 	if err != nil {
+		logrus.Errorf("get admin user: %v", err)
 		return ""
 	} else {
+		logrus.Debugf("admin user password: %s", user.Password)
 		return user.Password
 	}
 }
