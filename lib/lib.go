@@ -49,10 +49,10 @@ func (i *Instance) Server(dir string) {
 func (i *Instance) GetAdminPassword() string {
 	user, err := op.GetAdmin()
 	if err != nil {
-		utils.Log.Errorf("get admin user: %v", err)
+		utils.Log.Infof("get admin user: %v", err)
 		return ""
 	} else {
-		utils.Log.Debugf("admin user password: %s", user.Password)
+		utils.Log.Infof("admin user password: %s - %s - %d - %d", user.Username, user.Password, len(user.Password), user.IsAdmin())
 		return user.Password
 	}
 }
