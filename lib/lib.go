@@ -1,10 +1,13 @@
 package AList
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -12,6 +15,7 @@ import (
 	"github.com/alist-org/alist/v3/internal/bootstrap"
 	"github.com/alist-org/alist/v3/internal/bootstrap/data"
 	"github.com/alist-org/alist/v3/internal/conf"
+	"github.com/alist-org/alist/v3/internal/db"
 	"github.com/alist-org/alist/v3/pkg/utils"
 	"github.com/alist-org/alist/v3/pkg/utils/random"
 	"github.com/alist-org/alist/v3/server"
@@ -64,4 +68,20 @@ func (i *Instance) SetEnv(key, value string) error {
 
 func (i *Instance) GetEnv(key string) string {
 	return os.Getenv(key)
+}
+
+func (i *Instance) Shutdown() {
+	db.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := i.server.Shutdown(ctx); err != nil {
+			utils.Log.Fatal("HTTP server shutdown err: ", err)
+		}
+	}()
+	wg.Wait()
+	utils.Log.Println("Server exit")
 }
