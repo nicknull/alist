@@ -57,8 +57,9 @@ func (i *Instance) Server(dir string) {
 	}()
 }
 
-func (i *Instance) GenerateToken() (string, error) {
-	return common.GenerateToken("admin")
+func (i *Instance) GenerateToken() string {
+	token, _ := common.GenerateToken("admin")
+	return token
 }
 
 func (i *Instance) Shutdown() {
