@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/alist-org/alist/v3/internal/bootstrap"
+	"github.com/alist-org/alist/v3/internal/bootstrap/data"
+	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/internal/op"
 	"github.com/alist-org/alist/v3/server"
 
@@ -18,8 +20,14 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) Server() {
+func (i *Instance) Server(dir string) {
 
+	initConfig(dir)
+
+	bootstrap.Log()
+	bootstrap.InitDB()
+	data.InitData()
+	bootstrap.InitIndex()
 	bootstrap.InitAria2()
 	bootstrap.InitQbittorrent()
 	bootstrap.LoadStorages()
@@ -28,12 +36,12 @@ func (i *Instance) Server() {
 	engine.Use(gin.LoggerWithWriter(logrus.StandardLogger().Out), gin.RecoveryWithWriter(logrus.StandardLogger().Out))
 	server.Init(engine)
 
-	i.server = &http.Server{Addr: fmt.Sprintf("%s:%d", "127.0.0.1", 5244), Handler: engine}
+	i.server = &http.Server{Addr: fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort), Handler: engine}
 
 	go func() {
 		err := i.server.ListenAndServe()
 		if err != nil {
-			panic(err)
+			logrus.Fatalf("failed to server: %+v", err)
 		}
 	}()
 }
