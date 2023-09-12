@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -14,6 +15,8 @@ import (
 	"github.com/alist-org/alist/v3/pkg/utils/random"
 	"github.com/alist-org/alist/v3/server"
 
+	_ "github.com/alist-org/alist/v3/drivers"
+
 	_ "golang.org/x/mobile/bind"
 )
 
@@ -22,6 +25,8 @@ type Instance struct {
 }
 
 func (i *Instance) Server(dir string) {
+
+	dir = filepath.Join(dir, "data")
 
 	bootstrap.InitConfig(dir)
 	bootstrap.Log()

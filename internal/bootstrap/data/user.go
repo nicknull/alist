@@ -15,9 +15,6 @@ import (
 
 func initUser() {
 	admin, err := op.GetAdmin()
-	if err != nil {
-		utils.Log.Infof("[init user] Failed to get admin user: %v", err)
-	}
 	adminPassword := random.String(8)
 	envpass := os.Getenv("ALIST_ADMIN_PASSWORD")
 	if flags.Dev {

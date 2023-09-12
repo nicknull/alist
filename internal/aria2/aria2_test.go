@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	conf2.Conf = conf2.DefaultConfig()
+	conf2.Conf = conf2.DefaultConfig("")
 	absPath, err := filepath.Abs("../../data/temp")
 	if err != nil {
 		panic(err)
