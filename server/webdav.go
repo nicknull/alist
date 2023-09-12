@@ -21,7 +21,7 @@ var handler *webdav.Handler
 
 func WebDav(dav *gin.RouterGroup) {
 	handler = &webdav.Handler{
-		Prefix:     path.Join(conf.URL.Path, "/dav"),
+		Prefix:     path.Join("/dav"),
 		LockSystem: webdav.NewMemLS(),
 		Logger: func(request *http.Request, err error) {
 			log.Errorf("%s %s %+v", request.Method, request.URL.Path, err)

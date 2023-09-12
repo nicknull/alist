@@ -1,10 +1,8 @@
 package AList
 
 import (
-	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -67,8 +65,6 @@ func initConfig(dir string) {
 	logrus.Debugf("config: %+v", conf.Conf)
 
 	base.InitClient()
-
-	initURL()
 }
 
 func defaultConfig(dir string) *conf.Config {
@@ -106,15 +102,4 @@ func defaultConfig(dir string) *conf.Config {
 		MaxConnections:        0,
 		TlsInsecureSkipVerify: true,
 	}
-}
-
-func initURL() {
-	if !strings.Contains(conf.Conf.SiteURL, "://") {
-		conf.Conf.SiteURL = utils.FixAndCleanPath(conf.Conf.SiteURL)
-	}
-	u, err := url.Parse(conf.Conf.SiteURL)
-	if err != nil {
-		utils.Log.Fatalf("can't parse site_url: %+v", err)
-	}
-	conf.URL = u
 }
