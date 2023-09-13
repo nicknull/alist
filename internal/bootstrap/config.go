@@ -23,7 +23,8 @@ func InitConfig(dir string) {
 		if err != nil {
 			logrus.Fatalf("failed to create config file: %+v", err)
 		}
-		conf.Conf = conf.DefaultConfig(dir)
+		conf.Conf = conf.DefaultConfig()
+		conf.Conf.ResolvePaths(dir)
 		if !utils.WriteJsonToFile(configPath, conf.Conf) {
 			logrus.Fatalf("failed to create default config file")
 		}
@@ -31,13 +32,15 @@ func InitConfig(dir string) {
 		configBytes, err := os.ReadFile(configPath)
 		if err != nil {
 			logrus.Fatalf("reading config file error: %+v", err)
+
 		}
-		conf.Conf = conf.DefaultConfig(dir)
+		conf.Conf = conf.DefaultConfig()
 		err = utils.Json.Unmarshal(configBytes, conf.Conf)
 		if err != nil {
 			logrus.Fatalf("load config error: %+v", err)
 		}
 		// update config.json struct
+		conf.Conf.ResolvePaths(dir)
 		confBody, err := utils.Json.MarshalIndent(conf.Conf, "", "  ")
 		if err != nil {
 			logrus.Fatalf("marshal config error: %+v", err)

@@ -54,11 +54,14 @@ type Config struct {
 	TlsInsecureSkipVerify bool      `json:"tls_insecure_skip_verify" env:"TLS_INSECURE_SKIP_VERIFY"`
 }
 
-func DefaultConfig(dir string) *Config {
-	tempDir := filepath.Join(dir, "temp")
-	indexDir := filepath.Join(dir, "bleve")
-	logPath := filepath.Join(dir, "log/log.log")
-	dbPath := filepath.Join(dir, "data.db")
+func (c *Config) ResolvePaths(dir string) {
+	c.TempDir = filepath.Join(dir, "temp")
+	c.BleveDir = filepath.Join(dir, "bleve")
+	c.Log.Name = filepath.Join(dir, "log/log.log")
+	c.Database.DBFile = filepath.Join(dir, "data.db")
+}
+
+func DefaultConfig() *Config {
 	return &Config{
 		Scheme: Scheme{
 			Address:    "127.0.0.1",
@@ -71,17 +74,17 @@ func DefaultConfig(dir string) *Config {
 		},
 		JwtSecret:      random.String(16),
 		TokenExpiresIn: 48,
-		TempDir:        tempDir,
+		TempDir:        "",
 		Database: Database{
 			Type:        "sqlite3",
 			Port:        0,
 			TablePrefix: "x_",
-			DBFile:      dbPath,
+			DBFile:      "",
 		},
-		BleveDir: indexDir,
+		BleveDir: "",
 		Log: LogConfig{
 			Enable:     true,
-			Name:       logPath,
+			Name:       "",
 			MaxSize:    50,
 			MaxBackups: 30,
 			MaxAge:     28,
