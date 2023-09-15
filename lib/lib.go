@@ -31,7 +31,7 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) Server(dir string) {
+func (i *Instance) Server(dir string) string {
 
 	dir = filepath.Join(dir, "data")
 
@@ -62,19 +62,21 @@ func (i *Instance) Server(dir string) {
 		time.Sleep(time.Second)
 		rsp, err := http.Get("http://localhost:5244/ping")
 		if err != nil {
+			utils.Log.Println("start server failed, try later... : %v", err)
 			continue
 		}
 		_ = rsp.Body.Close()
 		if rsp.StatusCode != http.StatusOK {
+			utils.Log.Println("start server failed, try later... : %d", rsp.StatusCode)
 			continue
 		}
-		break
+		utils.Log.Println("start server success")
+		token, err := common.GenerateToken("admin")
+		if err != nil {
+			utils.Log.Fatal("generate token failed, exit app...")
+		}
+		return token
 	}
-}
-
-func (i *Instance) GenerateToken() string {
-	token, _ := common.GenerateToken("admin")
-	return token
 }
 
 func (i *Instance) Shutdown() {
