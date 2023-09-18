@@ -78,7 +78,7 @@ func (i *Instance) Server(dir string) (token string, err error) {
 		token, err = common.GenerateToken("admin")
 		return
 	}
-	err = fmt.Errorf("start server failed")
+	err = fmt.Errorf("启动服务失败")
 	return
 }
 
