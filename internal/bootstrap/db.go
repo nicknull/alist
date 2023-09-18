@@ -101,7 +101,8 @@ func InitDBIOS() error {
 	case "sqlite3":
 		{
 			if !(strings.HasSuffix(database.DBFile, ".db") && len(database.DBFile) > 3) {
-				log.Fatalf("db name error.")
+				log.Errorf("db name error.")
+				return fmt.Errorf("数据库路径错误")
 			}
 			dB, err = gorm.Open(sqlite.Open(fmt.Sprintf("%s?_journal=WAL&_vacuum=incremental",
 				database.DBFile)), gormConfig)
