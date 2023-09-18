@@ -45,6 +45,10 @@ func (i *Instance) Server(dir string) (token string, err error) {
 	if err != nil {
 		return
 	}
+	err = bootstrap.InitIndexIOS()
+	if err != nil {
+		return
+	}
 	err = bootstrap.LoadStoragesIOS()
 	if err != nil {
 		return
@@ -61,8 +65,8 @@ func (i *Instance) Server(dir string) (token string, err error) {
 	go func() {
 		_ = i.server.ListenAndServe()
 	}()
-	ping := fmt.Sprintf("%s:%d/%s", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort, "ping")
-	for i := 0; i < 3; i++ {
+	ping := fmt.Sprintf("http://%s:%d/%s", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort, "ping")
+	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second)
 		rsp, pingErr := http.Get(ping)
 		if pingErr != nil {
