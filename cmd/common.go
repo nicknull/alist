@@ -13,7 +13,7 @@ import (
 )
 
 func Init() {
-	bootstrap.InitConfig("")
+	bootstrap.InitConfig()
 	bootstrap.Log()
 	bootstrap.InitDB()
 	data.InitData()
