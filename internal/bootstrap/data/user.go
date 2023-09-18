@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/alist-org/alist/v3/cmd/flags"
@@ -77,5 +78,30 @@ func hashPwdForOldVersion() {
 				utils.Log.Fatalf("[hash pwd for old version] failed update user: %v", err)
 			}
 		}
+	}
+}
+
+func initUserIOS() error {
+	admin, err := op.GetAdmin()
+	adminPassword := random.String(8)
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		salt := random.String(16)
+		admin = &model.User{
+			Username: "admin",
+			Salt:     salt,
+			PwdHash:  model.TwoHashPwd(adminPassword, salt),
+			Role:     model.ADMIN,
+			BasePath: "/",
+		}
+		if err := op.CreateUser(admin); err != nil {
+			utils.Log.Errorf("[init user] Failed to create admin user: %v", err)
+			return fmt.Errorf("创建管理员用户失败")
+		} else {
+			utils.Log.Infof("Successfully created the admin user")
+			return nil
+		}
+	} else {
+		utils.Log.Errorf("[init user] Failed to get admin user: %v", err)
+		return fmt.Errorf("获取管理员用户失败")
 	}
 }

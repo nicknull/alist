@@ -10,3 +10,15 @@ func InitData() {
 		initDevDo()
 	}
 }
+
+func InitDataIOS() (err error) {
+	err = initUserIOS()
+	if err != nil {
+		return err
+	}
+	err = initSettingsIOS()
+	if err != nil {
+		return err
+	}
+	return
+}

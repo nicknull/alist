@@ -54,3 +54,10 @@ func Log() {
 	log.SetOutput(logrus.StandardLogger().Out)
 	utils.Log.Infof("init logrus...")
 }
+
+func LogIOS() {
+	setLog(logrus.StandardLogger())
+	setLog(utils.Log)
+	log.SetOutput(logrus.StandardLogger().Out)
+	utils.Log.Infof("init logrus...")
+}

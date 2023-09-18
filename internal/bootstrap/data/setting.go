@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"github.com/alist-org/alist/v3/cmd/flags"
 	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/internal/model"
@@ -178,4 +179,54 @@ func InitialSettings() []model.SettingItem {
 		}...)
 	}
 	return initialSettingItems
+}
+
+func initSettingsIOS() error {
+	InitialSettings()
+	// check deprecated
+	settings, err := op.GetSettingItems()
+	if err != nil {
+		utils.Log.Errorf("failed get settings: %+v", err)
+		return fmt.Errorf("获取设置配置失败")
+	}
+
+	for i := range settings {
+		if !isActive(settings[i].Key) && settings[i].Flag != model.DEPRECATED {
+			settings[i].Flag = model.DEPRECATED
+			err = op.SaveSettingItem(&settings[i])
+			if err != nil {
+				utils.Log.Errorf("failed save setting: %+v", err)
+				return fmt.Errorf("保存设置配置失败")
+			}
+		}
+	}
+
+	// create or save setting
+	for i := range initialSettingItems {
+		item := &initialSettingItems[i]
+		// err
+		stored, err := op.GetSettingItemByKey(item.Key)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.Log.Errorf("failed get setting: %+v", err)
+			return fmt.Errorf("获取设置配置失败")
+		}
+		// save
+		if stored != nil && item.Key != conf.VERSION {
+			item.Value = stored.Value
+		}
+		if stored == nil || *item != *stored {
+			err = op.SaveSettingItem(item)
+			if err != nil {
+				utils.Log.Errorf("failed save setting: %+v", err)
+				return fmt.Errorf("保存设置配置失败")
+			}
+		} else {
+			// Not save so needs to execute hook
+			_, err = op.HandleSettingItemHook(item)
+			if err != nil {
+				utils.Log.Errorf("failed to execute hook on %s: %+v", item.Key, err)
+			}
+		}
+	}
+	return nil
 }

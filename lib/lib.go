@@ -36,12 +36,15 @@ func (i *Instance) Server(dir string) (token string, err error) {
 	if err != nil {
 		return
 	}
-	bootstrap.Log()
+	bootstrap.LogIOS()
 	err = bootstrap.InitDBIOS()
 	if err != nil {
 		return
 	}
-	data.InitData()
+	err = data.InitDataIOS()
+	if err != nil {
+		return
+	}
 	err = bootstrap.LoadStoragesIOS()
 	if err != nil {
 		return
