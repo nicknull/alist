@@ -82,14 +82,16 @@ func hashPwdForOldVersion() {
 }
 
 func initUserIOS() error {
-	admin, err := op.GetAdmin()
-	adminPassword := random.String(8)
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	_, err := op.GetAdmin()
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		salt := random.String(16)
-		admin = &model.User{
+		admin := &model.User{
 			Username: "admin",
 			Salt:     salt,
-			PwdHash:  model.TwoHashPwd(adminPassword, salt),
+			PwdHash:  model.TwoHashPwd(random.String(8), salt),
 			Role:     model.ADMIN,
 			BasePath: "/",
 		}
