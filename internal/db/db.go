@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/alist-org/alist/v3/internal/conf"
@@ -16,6 +17,16 @@ func Init(d *gorm.DB) {
 	if err != nil {
 		log.Fatalf("failed migrate database: %s", err.Error())
 	}
+}
+
+func InitIOS(d *gorm.DB) error {
+	db = d
+	err := AutoMigrate(new(model.Storage), new(model.User), new(model.Meta), new(model.SettingItem), new(model.SearchNode))
+	if err != nil {
+		log.Errorf("failed migrate database: %s", err.Error())
+		return fmt.Errorf("数据库迁移失败")
+	}
+	return nil
 }
 
 func AutoMigrate(dst ...interface{}) error {

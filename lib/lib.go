@@ -15,7 +15,6 @@ import (
 	"github.com/alist-org/alist/v3/internal/bootstrap/data"
 	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/internal/db"
-	"github.com/alist-org/alist/v3/internal/op"
 	"github.com/alist-org/alist/v3/pkg/utils"
 	"github.com/alist-org/alist/v3/server"
 	"github.com/alist-org/alist/v3/server/common"
@@ -38,10 +37,12 @@ func (i *Instance) Server(dir string) (token string, err error) {
 		return
 	}
 	bootstrap.Log()
-	bootstrap.InitDB()
+	err = bootstrap.InitDBIOS()
+	if err != nil {
+		return
+	}
 	data.InitData()
-	bootstrap.InitIndex()
-	err = i.loadStorages()
+	err = bootstrap.LoadStoragesIOS()
 	if err != nil {
 		return
 	}
@@ -92,24 +93,4 @@ func (i *Instance) Shutdown() {
 	}()
 	wg.Wait()
 	utils.Log.Println("Server exit")
-}
-
-func (i *Instance) loadStorages() error {
-	storages, err := db.GetEnabledStorages()
-	if err != nil {
-		return err
-	}
-	for i := range storages {
-		utils.Log.Infof("start load storage: [%s], driver: [%s]",
-			storages[i].MountPath, storages[i].Driver)
-		err := op.LoadStorage(context.Background(), storages[i])
-		if err != nil {
-			return err
-		} else {
-			utils.Log.Infof("success load storage: [%s], driver: [%s]",
-				storages[i].MountPath, storages[i].Driver)
-		}
-	}
-	conf.StoragesLoaded = true
-	return nil
 }
