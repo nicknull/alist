@@ -28,8 +28,10 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) LoadCore(dir string) (err error) {
+func (i *Instance) Server(dir string) (token string, err error) {
+
 	dir = filepath.Join(dir, "data")
+
 	err = bootstrap.InitConfigIOS(dir)
 	if err != nil {
 		return
@@ -51,19 +53,9 @@ func (i *Instance) LoadCore(dir string) (err error) {
 	if err != nil {
 		return
 	}
-	return
-}
 
-func (i *Instance) StartAPIServer() (err error) {
-	token, err := common.GenerateToken("admin")
-	if err != nil {
-		return
-	}
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
-	engine.Use(func(c *gin.Context) {
-		c.Request.Header.Add("Authorization", token)
-	})
 	engine.Use(gin.LoggerWithWriter(logrus.StandardLogger().Out), gin.RecoveryWithWriter(logrus.StandardLogger().Out))
 	server.Init(engine)
 	i.server = &http.Server{
@@ -71,12 +63,7 @@ func (i *Instance) StartAPIServer() (err error) {
 		Handler: engine,
 	}
 	go func() {
-		err := i.server.ListenAndServe()
-		if err != nil {
-			utils.Log.Errorf("服务退出错误: %v", err)
-		} else {
-			utils.Log.Infof("服务退出成功")
-		}
+		_ = i.server.ListenAndServe()
 	}()
 	ping := fmt.Sprintf("http://%s:%d/%s", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort, "ping")
 	for i := 0; i < 10; i++ {
@@ -92,28 +79,11 @@ func (i *Instance) StartAPIServer() (err error) {
 			continue
 		}
 		utils.Log.Println("start server success")
+		token, err = common.GenerateToken("admin")
 		return
 	}
 	err = fmt.Errorf("启动服务失败")
 	return
-}
-
-func (i *Instance) RestartAPIServerIfNeeded() error {
-	ping := fmt.Sprintf("http://%s:%d/%s", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort, "ping")
-	rsp, err := http.Get(ping)
-	if err == nil && rsp.StatusCode == http.StatusOK {
-		return nil
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		_ = i.server.Shutdown(ctx)
-	}()
-	wg.Wait()
-	return i.StartAPIServer()
 }
 
 func (i *Instance) Shutdown() {
