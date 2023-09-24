@@ -21,7 +21,6 @@ import (
 	"github.com/alist-org/alist/v3/server/common"
 
 	_ "github.com/alist-org/alist/v3/drivers"
-
 	_ "golang.org/x/mobile/bind"
 )
 
@@ -29,7 +28,7 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) LoadCore(dir string) (err error) {
+func (i *Instance) LoadCore(dir string) (token string, err error) {
 	dir = filepath.Join(dir, "data")
 
 	err = bootstrap.InitConfigIOS(dir)
@@ -53,19 +52,13 @@ func (i *Instance) LoadCore(dir string) (err error) {
 	if err != nil {
 		return
 	}
+	token, err = common.GenerateToken("admin")
 	return
 }
 
 func (i *Instance) RunAPIServer() (err error) {
-	token, err := common.GenerateToken("admin")
-	if err != nil {
-		return
-	}
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
-	engine.Use(func(c *gin.Context) {
-		c.Request.Header.Add("Authorization", token)
-	})
 	engine.Use(gin.LoggerWithWriter(logrus.StandardLogger().Out), gin.RecoveryWithWriter(logrus.StandardLogger().Out))
 	server.Init(engine)
 	i.server = &http.Server{
