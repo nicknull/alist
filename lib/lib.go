@@ -59,8 +59,9 @@ func (i *Instance) LoadCore(dir string) (err error) {
 	}
 	token, err := common.GenerateToken("admin")
 	if err != nil {
-		i.token = token
+		return
 	}
+	i.token = token
 	return
 }
 
