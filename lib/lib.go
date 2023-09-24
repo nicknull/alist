@@ -26,9 +26,14 @@ import (
 
 type Instance struct {
 	server *http.Server
+	token  string
 }
 
-func (i *Instance) LoadCore(dir string) (token string, err error) {
+func (i *Instance) GetToken() string {
+	return i.token
+}
+
+func (i *Instance) LoadCore(dir string) (err error) {
 	dir = filepath.Join(dir, "data")
 
 	err = bootstrap.InitConfigIOS(dir)
@@ -52,7 +57,10 @@ func (i *Instance) LoadCore(dir string) (token string, err error) {
 	if err != nil {
 		return
 	}
-	token, err = common.GenerateToken("admin")
+	token, err := common.GenerateToken("admin")
+	if err != nil {
+		i.token = token
+	}
 	return
 }
 
