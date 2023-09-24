@@ -101,6 +101,9 @@ func (i *Instance) RunAPIServer() (err error) {
 }
 
 func (i *Instance) CheckAPIServerAlive() bool {
+	if conf.Conf == nil {
+		return false
+	}
 	l, err := net.Listen("tcp4", fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort))
 	if err != nil {
 		return true
