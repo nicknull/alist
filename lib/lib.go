@@ -102,12 +102,11 @@ func (i *Instance) RunAPIServer() (err error) {
 
 func (i *Instance) CheckAPIServerAlive() bool {
 	l, err := net.Listen("tcp4", fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort))
-	defer func() {
-		if l != nil {
-			_ = l.Close()
-		}
-	}()
-	return err == nil
+	if err != nil {
+		return true
+	}
+	_ = l.Close()
+	return false
 }
 
 func (i *Instance) Shutdown() {
