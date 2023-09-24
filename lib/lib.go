@@ -3,6 +3,7 @@ package AList
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"path/filepath"
 	"sync"
@@ -28,8 +29,7 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) Server(dir string) (token string, err error) {
-
+func (i *Instance) LoadCore(dir string) (err error) {
 	dir = filepath.Join(dir, "data")
 
 	err = bootstrap.InitConfigIOS(dir)
@@ -53,9 +53,19 @@ func (i *Instance) Server(dir string) (token string, err error) {
 	if err != nil {
 		return
 	}
+	return
+}
 
+func (i *Instance) RunAPIServer() (err error) {
+	token, err := common.GenerateToken("admin")
+	if err != nil {
+		return
+	}
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
+	engine.Use(func(c *gin.Context) {
+		c.Request.Header.Add("Authorization", token)
+	})
 	engine.Use(gin.LoggerWithWriter(logrus.StandardLogger().Out), gin.RecoveryWithWriter(logrus.StandardLogger().Out))
 	server.Init(engine)
 	i.server = &http.Server{
@@ -79,11 +89,20 @@ func (i *Instance) Server(dir string) (token string, err error) {
 			continue
 		}
 		utils.Log.Println("start server success")
-		token, err = common.GenerateToken("admin")
 		return
 	}
 	err = fmt.Errorf("启动服务失败")
 	return
+}
+
+func (i *Instance) CheckAPIServerAlive() bool {
+	l, err := net.Listen("tcp4", fmt.Sprintf("%s:%d", conf.Conf.Scheme.Address, conf.Conf.Scheme.HttpPort))
+	defer func() {
+		if l != nil {
+			_ = l.Close()
+		}
+	}()
+	return err == nil
 }
 
 func (i *Instance) Shutdown() {
