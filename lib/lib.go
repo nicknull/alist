@@ -21,16 +21,24 @@ import (
 	"github.com/alist-org/alist/v3/server/common"
 
 	_ "github.com/alist-org/alist/v3/drivers"
+
 	_ "golang.org/x/mobile/bind"
 )
 
 type Instance struct {
 	server *http.Server
-	token  string
 }
 
-func (i *Instance) GetToken() string {
-	return i.token
+func (i *Instance) GetToken() (string, error) {
+	return common.GenerateToken("admin")
+}
+
+func (i *Instance) MustGetToken() string {
+	token, err := i.GetToken()
+	if err != nil {
+		utils.Log.Fatalf("获取管理员权限失败")
+	}
+	return token
 }
 
 func (i *Instance) LoadCore(dir string) (err error) {
@@ -57,11 +65,6 @@ func (i *Instance) LoadCore(dir string) (err error) {
 	if err != nil {
 		return
 	}
-	token, err := common.GenerateToken("admin")
-	if err != nil {
-		return
-	}
-	i.token = token
 	return
 }
 
