@@ -8,7 +8,6 @@ import (
 	"github.com/alist-org/alist/v3/server/common"
 	"github.com/alist-org/alist/v3/server/handles"
 	"github.com/alist-org/alist/v3/server/middlewares"
-	"github.com/alist-org/alist/v3/server/static"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -74,9 +73,10 @@ func Init(e *gin.Engine) {
 	if flags.Debug || flags.Dev {
 		debug(g.Group("/debug"))
 	}
-	static.Static(g, func(handlers ...gin.HandlerFunc) {
-		e.NoRoute(handlers...)
-	})
+	// iOS 不需要Web
+	//static.Static(g, func(handlers ...gin.HandlerFunc) {
+	//	e.NoRoute(handlers...)
+	//})
 }
 
 func admin(g *gin.RouterGroup) {
