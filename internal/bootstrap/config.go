@@ -171,5 +171,7 @@ func InitConfigIOS(dir string) error {
 
 	base.InitClient()
 
+	initURL()
+
 	return nil
 }

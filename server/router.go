@@ -4,16 +4,23 @@ import (
 	"github.com/alist-org/alist/v3/cmd/flags"
 	"github.com/alist-org/alist/v3/internal/conf"
 	"github.com/alist-org/alist/v3/internal/message"
+	"github.com/alist-org/alist/v3/pkg/utils"
 	"github.com/alist-org/alist/v3/server/common"
 	"github.com/alist-org/alist/v3/server/handles"
 	"github.com/alist-org/alist/v3/server/middlewares"
+	"github.com/alist-org/alist/v3/server/static"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Init(e *gin.Engine) {
+	if !utils.SliceContains([]string{"", "/"}, conf.URL.Path) {
+		e.GET("/", func(c *gin.Context) {
+			c.Redirect(302, conf.URL.Path)
+		})
+	}
 	Cors(e)
-	g := e.Group("")
+	g := e.Group(conf.URL.Path)
 	if conf.Conf.Scheme.HttpPort != -1 && conf.Conf.Scheme.HttpsPort != -1 && conf.Conf.Scheme.ForceHttps {
 		e.Use(middlewares.ForceHttps)
 	}
@@ -67,6 +74,9 @@ func Init(e *gin.Engine) {
 	if flags.Debug || flags.Dev {
 		debug(g.Group("/debug"))
 	}
+	static.Static(g, func(handlers ...gin.HandlerFunc) {
+		e.NoRoute(handlers...)
+	})
 }
 
 func admin(g *gin.RouterGroup) {
