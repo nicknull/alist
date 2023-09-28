@@ -29,16 +29,8 @@ type Instance struct {
 	server *http.Server
 }
 
-func (i *Instance) GetToken() (string, error) {
+func (i *Instance) GenerateToken() (string, error) {
 	return common.GenerateToken("admin")
-}
-
-func (i *Instance) MustGetToken() string {
-	token, err := i.GetToken()
-	if err != nil {
-		utils.Log.Fatalf("获取管理员权限失败")
-	}
-	return token
 }
 
 func (i *Instance) LoadCore(dir string) (err error) {
