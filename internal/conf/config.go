@@ -64,7 +64,7 @@ func (c *Config) ResolvePaths(dir string) {
 func DefaultConfig() *Config {
 	return &Config{
 		Scheme: Scheme{
-			Address:    "127.0.0.1",
+			Address:    "0.0.0.0",
 			UnixFile:   "",
 			HttpPort:   5244,
 			HttpsPort:  -1,
