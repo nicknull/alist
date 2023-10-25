@@ -40,6 +40,7 @@ require (
 	github.com/pkg/sftp v1.13.6
 	github.com/pquerna/otp v1.4.0
 	github.com/rclone/rclone v1.63.1
+	github.com/sagernet/gomobile v0.0.0-20230915142329-c6740b6d2950
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
@@ -50,7 +51,6 @@ require (
 	golang.org/x/crypto v0.13.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	golang.org/x/image v0.12.0
-	golang.org/x/mobile v0.0.0-20230906132913-2077a3224571
 	golang.org/x/net v0.15.0
 	golang.org/x/oauth2 v0.12.0
 	gorm.io/driver/mysql v1.4.7

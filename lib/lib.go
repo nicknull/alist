@@ -22,7 +22,8 @@ import (
 
 	_ "github.com/alist-org/alist/v3/drivers"
 
-	_ "golang.org/x/mobile/bind"
+	// _ "github.com/sagernet/gomobile/event/key"
+	_ "github.com/sagernet/gomobile/bind"
 )
 
 type Instance struct {
